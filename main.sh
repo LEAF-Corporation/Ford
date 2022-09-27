@@ -2,5 +2,8 @@
 
 cd ~/
 source env/bin/activate
-python3 window.py
+echo "Virtual enviroment iniated!"
+echo "Ford Multimidia GUI V1.0"
+echo "Starting..."
+python3 gui.py
 exit 0
