@@ -28,6 +28,14 @@ def assets(path):
 
 
 def google_assistant():
+    CanvasButton(canvas, 6, 15, 'assets/assistant2.png', nothing)
+    try:
+        os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
+    except Exception as err:
+        print(f'Error, {err}')
+
+
+def nothing():
     Popen(['googlesamples-assistant-pushtotalk --credentials /home/cd52022/.config/google-oauthlib-tool/credentials.json'],
           stdin=PIPE, shell=True)
 
@@ -43,6 +51,10 @@ os.system('/bin/bash -c "source env/bin/activate"')
 window.geometry('480x320')
 window.configure(bg='#363636')
 
+termf = tk.Frame(window, height=300, width=250)
+termf.pack(fill=tk.BOTH, expand=tk.YES)
+wid = termf.winfo_id()
+
 canvas = tk.Canvas(
     window,
     bg='#363636',
@@ -52,6 +64,7 @@ canvas = tk.Canvas(
     highlightthickness=0,
     relief='flat'
 )
+
 
 canvas.place(x=0, y=0)
 image_image_1 = ImageTk.PhotoImage(assets('image_1.png'))
