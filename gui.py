@@ -1,5 +1,5 @@
 import os
-from subprocess import Popen, PIPE
+import subprocess as sub
 from PIL import Image, ImageTk
 import tkinter as tk
 
@@ -35,9 +35,48 @@ def google_assistant():
         print(f'Error, {err}')
 
 
+def vol_up():
+    print('Volume +')
+
+
+def vol_down():
+    print('Volume -')
+
+
+def back():
+    print('Voltar')
+
+
+def home():
+    print('Menu principal')
+
+
+def help_menu():
+    print('Ajuda')
+
+
+def maps():
+    print('Mapa')
+
+
+def radio():
+    print('Rádio')
+
+
+def bluetooth():
+    print('Bluetooth')
+
+
+def settings():
+    print('Configurações')
+
+
+def telephone():
+    print('Ligação')
+
+
 def nothing():
-    Popen(['googlesamples-assistant-pushtotalk --credentials /home/cd52022/.config/google-oauthlib-tool/credentials.json'],
-          stdin=PIPE, shell=True)
+    sub.run(["echo", "hello"],  text=True, shell=True, stdout=sub.PIPE, stdin=sub.DEVNULL, stderr=sub.DEVNULL)
 
 
 def end():
@@ -45,8 +84,11 @@ def end():
 
 
 window = tk.Tk()
-os.system('cd ~/')
-os.system('/bin/bash -c "source env/bin/activate"')
+try:
+    os.system('cd ~/')
+    os.system('/bin/bash -c "source env/bin/activate"')
+except Exception as err:
+    print(f'Error: {err}')
 
 window.geometry('480x320')
 window.configure(bg='#363636')
@@ -65,27 +107,36 @@ canvas = tk.Canvas(
     relief='flat'
 )
 
-
-canvas.place(x=0, y=0)
-image_image_1 = ImageTk.PhotoImage(assets('image_1.png'))
-image_1 = canvas.create_image(
-    240.0,
-    160.0,
-    image=image_image_1
+canvas2 = tk.Canvas(
+    window,
+    bg='#363636',
+    height=320,
+    width=480,
+    bd=0,
+    highlightthickness=0,
+    relief='flat'
 )
 
-vol_btn = CanvasButton(canvas, 6, 279, 'assets/vol-.png', end)
-vol_btn2 = CanvasButton(canvas, 6, 213, 'assets/vol+.png', end)
-return_btn = CanvasButton(canvas, 6, 147, 'assets/return.png', end)
-home_btn = CanvasButton(canvas, 6, 81, 'assets/home.png', end)
+canvas.place(x=0, y=0)
+pic = ImageTk.PhotoImage(assets('image_1.png'))
+background = canvas.create_image(
+    240.0,
+    160.0,
+    image=pic
+)
+
+vol_btn = CanvasButton(canvas, 6, 279, 'assets/vol-.png', vol_down)
+vol_btn2 = CanvasButton(canvas, 6, 213, 'assets/vol+.png', vol_up)
+return_btn = CanvasButton(canvas, 6, 147, 'assets/return.png', back)
+home_btn = CanvasButton(canvas, 6, 81, 'assets/home.png', home)
 close_btn = CanvasButton(canvas, 6, 15, 'assets/close.png', end)
-assistant_btn = CanvasButton(canvas, 336, 193, 'assets/assistant.png', google_assistant)
-help_btn = CanvasButton(canvas, 240, 195, 'assets/help.png', end)
-settings_btn = CanvasButton(canvas, 128, 194, 'assets/settings.png', end)
-bluetooth_btn = CanvasButton(canvas, 171, 69, 'assets/bluetooth.png', end)
-radio_btn = CanvasButton(canvas, 395, 69, 'assets/radio.png', end)
-telephone_btn = CanvasButton(canvas, 70, 70, 'assets/telephone.png', end)
-maps_btn = CanvasButton(canvas, 305, 65, 'assets/maps.png', end)
+assistant_btn = CanvasButton(canvas, 336, 193, 'assets/assistant.png', nothing)
+help_btn = CanvasButton(canvas, 240, 195, 'assets/help.png', help_menu)
+settings_btn = CanvasButton(canvas, 128, 194, 'assets/settings.png', settings)
+bluetooth_btn = CanvasButton(canvas, 171, 69, 'assets/bluetooth.png', bluetooth)
+radio_btn = CanvasButton(canvas, 395, 69, 'assets/radio.png', radio)
+telephone_btn = CanvasButton(canvas, 70, 70, 'assets/telephone.png', telephone)
+maps_btn = CanvasButton(canvas, 305, 65, 'assets/maps.png', maps)
 
 # window.attributes('-fullscreen', True)
 window.resizable(False, False)
