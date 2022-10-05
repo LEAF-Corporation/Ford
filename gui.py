@@ -2,6 +2,7 @@ import os
 import subprocess as sub
 from PIL import Image, ImageTk
 import tkinter as tk
+from pycaw.pycaw import AudioUtilities
 
 
 class CanvasButton:
@@ -35,12 +36,39 @@ def google_assistant():
         print(f'Error, {err}')
 
 
+class AudioController:
+    def __init__(self, process_name):
+        self.process_name = process_name
+        self.volume = self.process_volume()
+
+    def process_volume(self):
+        sessions = AudioUtilities.GetAllSessions()
+        for session in sessions:
+            interface = session.SimpleAudioVolume
+            if session.Process and session.Process.name() == self.process_name:
+                print("Volume:", interface.GetMasterVolume())  # debug
+                return interface.GetMasterVolume()
+
+    def set_volume(self, decibels):
+        sessions = AudioUtilities.GetAllSessions()
+        for session in sessions:
+            interface = session.SimpleAudioVolume
+            if session.Process and session.Process.name() == self.process_name:
+                self.volume = min(1.0, max(0.0, decibels))
+                interface.SetMasterVolume(self.volume, None)
+                print("Volume set to", self.volume)  # debug
+
+
 def vol_up():
-    print('Volume +')
+    audio_controller = AudioController("python.exe")
+    audio_controller.set_volume(1.0)
+    print('Vol +')
 
 
 def vol_down():
-    print('Volume -')
+    audio_controller = AudioController("python.exe")
+    audio_controller.set_volume(0.3)
+    print('Vol -')
 
 
 def back():
@@ -52,7 +80,9 @@ def home():
 
 
 def help_menu():
-    print('Ajuda')
+    import platform
+    value = platform.uname()
+    print(f'System: {value.system}; Version: {value.version}; Machine: {value.machine}')
 
 
 def maps():
@@ -68,7 +98,7 @@ def bluetooth():
 
 
 def settings():
-    print('Configurações')
+    import platform
 
 
 def telephone():
@@ -84,6 +114,7 @@ def end():
 
 
 window = tk.Tk()
+
 try:
     os.system('cd ~/')
     os.system('/bin/bash -c "source env/bin/activate"')
