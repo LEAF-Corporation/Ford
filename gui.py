@@ -2,7 +2,7 @@ import os
 import subprocess as sub
 from PIL import Image, ImageTk
 import tkinter as tk
-from pycaw.pycaw import AudioUtilities
+import pygame as pyg
 
 
 class CanvasButton:
@@ -24,6 +24,53 @@ class CanvasButton:
         self.canvas.itemconfigure(self.canvas_btn_img_obj, state=state)
 
 
+class MyLabel(tk.Label):
+    def __init__(self, master, filename):
+        im = Image.open(filename)
+        seq = []
+        try:
+            while 1:
+                seq.append(im.copy())
+                im.seek(len(seq)) # skip to next frame
+        except EOFError:
+            pass # we're done
+
+        try:
+            self.delay = im.info['duration']
+        except KeyError:
+            self.delay = 100
+
+        first = seq[0].convert('RGBA')
+        self.frames = [ImageTk.PhotoImage(first)]
+
+        tk.Label.__init__(self, master, image=self.frames[0])
+
+        lut = [1] * 256
+        lut[im.info["transparency"]] = 0
+
+        temp = seq[0]
+        for image in seq[1:]:
+            mask = image.point(lut, "1")
+            # point() is used to map image pixels into mask pixels
+            # via the lookup table (lut), creating a mask
+            # with value 0 at transparent pixels and
+            # 1 elsewhere
+            temp.paste(image, None, mask)
+            frame = temp.convert('RGBA')
+            self.frames.append(ImageTk.PhotoImage(frame))
+
+        self.idx = 0
+
+        self.cancel = self.after(1000, self.play)
+
+    def play(self):
+        self.config(image=self.frames[self.idx])
+        self.idx += 1
+        if self.idx == len(self.frames):
+            self.idx = 0
+        self.cancel = self.after(self.delay, self.play)
+
+
 def assets(path):
     return Image.open("assets/" + path).convert("RGBA")
 
@@ -36,38 +83,17 @@ def google_assistant():
         print(f'Error, {err}')
 
 
-class AudioController:
-    def __init__(self, process_name):
-        self.process_name = process_name
-        self.volume = self.process_volume()
-
-    def process_volume(self):
-        sessions = AudioUtilities.GetAllSessions()
-        for session in sessions:
-            interface = session.SimpleAudioVolume
-            if session.Process and session.Process.name() == self.process_name:
-                print("Volume:", interface.GetMasterVolume())  # debug
-                return interface.GetMasterVolume()
-
-    def set_volume(self, decibels):
-        sessions = AudioUtilities.GetAllSessions()
-        for session in sessions:
-            interface = session.SimpleAudioVolume
-            if session.Process and session.Process.name() == self.process_name:
-                self.volume = min(1.0, max(0.0, decibels))
-                interface.SetMasterVolume(self.volume, None)
-                print("Volume set to", self.volume)  # debug
+def play_sound():
+    pyg.init()
+    pyg.mixer.music.load('sounds/google.mp3')
+    pyg.mixer.music.play(loops=1)
 
 
 def vol_up():
-    audio_controller = AudioController("python.exe")
-    audio_controller.set_volume(1.0)
     print('Vol +')
 
 
 def vol_down():
-    audio_controller = AudioController("python.exe")
-    audio_controller.set_volume(0.3)
     print('Vol -')
 
 
@@ -98,7 +124,7 @@ def bluetooth():
 
 
 def settings():
-    import platform
+    print('Ajustes')
 
 
 def telephone():
@@ -113,6 +139,12 @@ def end():
     exit(0)
 
 
+def stop_it():
+    while True:
+        anim = MyLabel(window, 'assets/animation.gif')
+        anim.pack()
+
+
 window = tk.Tk()
 
 try:
@@ -123,10 +155,6 @@ except Exception as err:
 
 window.geometry('480x320')
 window.configure(bg='#363636')
-
-termf = tk.Frame(window, height=300, width=250)
-termf.pack(fill=tk.BOTH, expand=tk.YES)
-wid = termf.winfo_id()
 
 canvas = tk.Canvas(
     window,
@@ -156,12 +184,13 @@ background = canvas.create_image(
     image=pic
 )
 
+
 vol_btn = CanvasButton(canvas, 6, 279, 'assets/vol-.png', vol_down)
 vol_btn2 = CanvasButton(canvas, 6, 213, 'assets/vol+.png', vol_up)
 return_btn = CanvasButton(canvas, 6, 147, 'assets/return.png', back)
 home_btn = CanvasButton(canvas, 6, 81, 'assets/home.png', home)
 close_btn = CanvasButton(canvas, 6, 15, 'assets/close.png', end)
-assistant_btn = CanvasButton(canvas, 336, 193, 'assets/assistant.png', nothing)
+assistant_btn = CanvasButton(canvas, 336, 193, 'assets/assistant.png', stop_it)
 help_btn = CanvasButton(canvas, 240, 195, 'assets/help.png', help_menu)
 settings_btn = CanvasButton(canvas, 128, 194, 'assets/settings.png', settings)
 bluetooth_btn = CanvasButton(canvas, 171, 69, 'assets/bluetooth.png', bluetooth)
@@ -169,6 +198,8 @@ radio_btn = CanvasButton(canvas, 395, 69, 'assets/radio.png', radio)
 telephone_btn = CanvasButton(canvas, 70, 70, 'assets/telephone.png', telephone)
 maps_btn = CanvasButton(canvas, 305, 65, 'assets/maps.png', maps)
 
+
 # window.attributes('-fullscreen', True)
+window.title('Ford Multimídia V2.23')
 window.resizable(False, False)
 window.mainloop()
