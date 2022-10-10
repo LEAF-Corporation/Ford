@@ -85,6 +85,10 @@ def end():
     exit(0)
 
 
+
+pyg.init()
+pyg.mixer.music.load('sounds/startup.mp3')
+pyg.mixer.music.play(loops=1)
 window = tk.Tk()
 
 try:
@@ -120,6 +124,7 @@ background = canvas.create_image(
     160.0,
     image=pic
 )
+
 
 
 vol_btn = CanvasButton(canvas, 6, 279, 'assets/vol-.png', vol_down)
