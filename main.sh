@@ -2,8 +2,12 @@
 
 cd ~/
 source env/bin/activate
-echo "Virtual enviroment iniated!"
-echo "Ford Multimidia GUI V1.0"
-echo "Starting..."
+echo "Virtual Env. Iniated!"
+
+googlesamples-assistant-hotword
+echo "Initializing Google-Assistant..."
+
+echo "Ford Multimidia GUI V2.23"
 python3 gui.py
+echo "Starting..."
 exit 0
