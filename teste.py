@@ -1,69 +1,30 @@
 from tkinter import *
-from PIL import Image, ImageTk
 
 
-class MyLabel(Label):
-    def __init__(self, master, filename):
-        im = Image.open(filename)
-        seq =  []
-        try:
-            while 1:
-                seq.append(im.copy())
-                im.seek(len(seq)) # skip to next frame
-        except EOFError:
-            pass # we're done
-
-        try:
-            self.delay = im.info['duration']
-        except KeyError:
-            self.delay = 100
-
-        first = seq[0].convert('RGBA')
-        self.frames = [ImageTk.PhotoImage(first)]
-
-        Label.__init__(self, master, image=self.frames[0])
-
-        lut = [1] * 256
-        lut[im.info["transparency"]] = 0
-
-        temp = seq[0]
-        for image in seq[1:]:
-            mask = image.point(lut, "1")
-            # point() is used to map image pixels into mask pixels
-            # via the lookup table (lut), creating a mask
-            # with value 0 at transparent pixels and
-            # 1 elsewhere
-            temp.paste(image, None, mask) #paste with mask
-            frame = temp.convert('RGBA')
-            self.frames.append(ImageTk.PhotoImage(frame))
-
-        self.idx = 0
-
-        self.cancel = self.after(1000, self.play)
-
-    def play(self):
-        self.config(image=self.frames[self.idx])
-        self.idx += 1
-        if self.idx == len(self.frames):
-            self.idx = 0
-        self.cancel = self.after(self.delay, self.play)
-
+def raise_frame(frame):
+    frame.tkraise()
 
 root = Tk()
 
-anim = MyLabel(root, 'assets/animation.gif')
-anim.pack()
+f1 = Frame(root)
+f2 = Frame(root)
+f3 = Frame(root)
+f4 = Frame(root)
 
+for frame in (f1, f2, f3, f4):
+    frame.grid(row=0, column=0, sticky='news')
 
-def play_it():
-    anim.after_idle(anim.play)
+Button(f1, text='Go to frame 2', command=lambda:raise_frame(f2)).pack()
+Label(f1, text='FRAME 1').pack()
 
+Label(f2, text='FRAME 2').pack()
+Button(f2, text='Go to frame 3', command=lambda:raise_frame(f3)).pack()
 
-def stop_it():
-    anim.after_cancel(anim.cancel)
+Label(f3, text='FRAME 3').pack(side='left')
+Button(f3, text='Go to frame 4', command=lambda:raise_frame(f4)).pack(side='left')
 
+Label(f4, text='FRAME 4').pack()
+Button(f4, text='Goto to frame 1', command=lambda:raise_frame(f1)).pack()
 
-Button(root, text='play', command=play_it).pack()
-Button(root, text='stop', command=stop_it).pack()
-
+raise_frame(f1)
 root.mainloop()
