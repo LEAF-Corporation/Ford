@@ -96,10 +96,12 @@ def end():
     exit(0)
 
 
+def startup():
+    pyg.init()
+    pyg.mixer.music.load('sounds/startup.mp3')
+    pyg.mixer.music.play(loops=1)
 
-pyg.init()
-pyg.mixer.music.load('sounds/startup.mp3')
-pyg.mixer.music.play(loops=1)
+
 window = tk.Tk()
 
 try:
@@ -108,7 +110,8 @@ try:
     print(f'System: {value.system}; Version: {value.version}; Machine: {value.machine}')
     print('Ford Multimidia - V2.23')
     if value.system != 'Windows':
-        subprocess.run('googlesamples-assistant-hotword', shell=True, check=True)
+        pass
+        # subprocess.run('googlesamples-assistant-hotword', shell=True, check=True)
     else:
         print('Debug mode: ON')
 except Exception as err:
@@ -134,8 +137,6 @@ background = canvas.create_image(
     160.0,
     image=pic
 )
-
-
 
 vol_btn = CanvasButton(canvas, 6, 279, 'assets/vol-.png', vol_down)
 vol_btn2 = CanvasButton(canvas, 6, 213, 'assets/vol+.png', vol_up)
