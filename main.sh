@@ -1,13 +1,8 @@
 #!/bin/bash
 
-cd ~/
+cd ~/Ford-master
 source env/bin/activate
-echo "Virtual Env. Iniated!"
-
-googlesamples-assistant-hotword
-echo "Initializing Google-Assistant..."
-
 echo "Ford Multimidia GUI V2.23"
-python3 gui.py
 echo "Starting..."
+python gui.py
 exit 0

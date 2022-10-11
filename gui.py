@@ -1,4 +1,6 @@
-import os
+import subprocess
+import time
+
 from PIL import Image, ImageTk
 import tkinter as tk
 import pygame as pyg
@@ -29,16 +31,25 @@ def assets(path):
 
 def ok_google():
     try:
-        play_sound()
-        CanvasButton(canvas, 45, 0, 'assets/ok_google.png', os.system('googlesamples-assistant-hotword'))
+        play_sound(0)
+        time.sleep(1)
+        try:
+            subprocess.run('googlesamples-assistant-pushtotalk', shell=True, check=True)
+        except Exception as err:
+            play_sound(1)
+            print(err)
     except Exception as err:
         print(f'Error: {err}')
 
 
-def play_sound():
+def play_sound(value):
     pyg.init()
-    pyg.mixer.music.load('sounds/google.mp3')
-    pyg.mixer.music.play(loops=1)
+    if value == 0:
+        pyg.mixer.music.load('sounds/google-in.mp3')
+        pyg.mixer.music.play(loops=1)
+    if value == 1:
+        pyg.mixer.music.load('sounds/google-out.mp3')
+        pyg.mixer.music.play(loops=1)
 
 
 def vol_up():
@@ -97,8 +108,7 @@ try:
     print(f'System: {value.system}; Version: {value.version}; Machine: {value.machine}')
     print('Ford Multimidia - V2.23')
     if value.system != 'Windows':
-        os.system('cd ~/')
-        os.system('/bin/bash -c "source env/bin/activate"')
+        subprocess.run('googlesamples-assistant-hotword', shell=True, check=True)
     else:
         print('Debug mode: ON')
 except Exception as err:
